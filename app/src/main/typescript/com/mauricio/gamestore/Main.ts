@@ -1,8 +1,9 @@
+
 import { CustomerController } from './controller/CustomerController.js';
 import { GameCategoryController } from './controller/GameCategoryController.js';
-import { GameController } from './controller/GameController.js';
+import { GameControllerHttp } from './controller/GameControllerHttp.js';
 import { PurchaseController } from './controller/PurchaseController.js';
-import { CustomerNotFoundError, CustomerService } from './model/service/CustomerService.js';
+import { CustomerService } from './model/service/CustomerService.js';
 import { GameCategoryService } from './model/service/GameCategoryService.js';
 import { GameService } from './model/service/GameService.js';
 import { PurchaseService } from './model/service/PurchaseService.js';
@@ -12,7 +13,9 @@ import { GameView } from './view/GameView.js';
 import { MainView } from './view/MainView.js';
 import { PurchaseView } from './view/PurchaseView.js';
 import { ICustomerService } from './model/interfaces/ICustomerService.js';
-import { HttpRequestError } from './controller/CustomerController.js';
+import express, { Request, Response } from 'express';
+import { GameViewHtml } from './view/GameViewHtml.js';
+import { GameControllerTerminal } from './controller/GameControllerTerminal.js';
 
 async function main(): Promise<void> {
 
@@ -21,39 +24,67 @@ async function main(): Promise<void> {
 
     const gameCategoryService = new GameCategoryService(databaseConnection);
     const gameService = new GameService(databaseConnection);
-    const customerService = new CustomerService(databaseConnection) as unknown as ICustomerService ;
+    const customerService = new CustomerService(databaseConnection) as unknown as ICustomerService;
     const purchaseService = new PurchaseService(databaseConnection);
 
+    const gameViewHtml = new GameViewHtml();
+
     const gameCategoryController = new GameCategoryController(gameCategoryService);
-    const gameController = new GameController(gameCategoryService, gameService);
+    const gameView = new GameView(gameCategoryController);
+    const gameControllerTerminal = new GameControllerTerminal(
+        gameCategoryService,
+        gameService,
+        gameView
+    );
+    const gameControllerHttp = new GameControllerHttp(
+        gameCategoryService,
+        gameService,
+        gameViewHtml
+    );
     const customerController = new CustomerController(customerService);
     const purchaseController = new PurchaseController(purchaseService, customerService, gameService);
 
     const customerView = new CustomerView(customerController);
-    const gameView  = new GameView(gameController, gameCategoryController);
-    const purchaseView = new PurchaseView(purchaseController, customerController, gameController, gameCategoryController);
+    const purchaseView = new PurchaseView(purchaseController, customerController, gameControllerTerminal);
 
-    const mainView = new MainView(customerView, gameView, purchaseView);   
+    const mainView = new MainView(customerView, gameControllerTerminal, purchaseView);
 
     while (true) {
         try {
-                await mainView.displayMenu();
-            } catch(error: any) {
-
-                
-                if(error instanceof HttpRequestError) {
-                    // Saída de erro colorida no console
-                    console.error(
-                        `\x1b[31m[ERRO - ${error.code || 'N/A'}] ${error.message}\x1b[0m\n` +
-                        `\x1b[33mStatus:\x1b[0m ${error.status || 'N/A'}\n` +
-                        `\x1b[90mTimestamp:\x1b[0m ${new Date().toLocaleString()}`
-                    );
-            
-                } else {
-                    console.log(error);
-                }
+            await mainView.displayMenu();
+        } catch (error: any) {
+            if (error instanceof Error) {
+                console.error(
+                    `\x1b[31m[ERRO - ${error.name || 'N/A'}] ${error.message}\x1b[0m\n`
+                );
             }
+            console.log(error);
+        }
     }
+
+    // const app = express();
+    // app.use(express.urlencoded({ extended: true }));
+
+    // app.get('/', (req: Request, res: Response) => gameControllerHttp.getAllGamesJson(req, res));
+
+    // app.get('/view', (req: Request, res: Response) => gameControllerHttp.getAllGames(req, res));
+    // app.get('/view/games/new', (req: Request, res: Response) =>
+    //     gameControllerHttp.showCreateForm(req, res)
+    // );
+    // app.post('/view/games', (req: Request, res: Response) => gameControllerHttp.createGame(req, res));
+    // app.get('/view/games/:id/edit', (req: Request, res: Response) =>
+    //     gameControllerHttp.showEditForm(req, res)
+    // );
+    // app.post('/view/games/:id', (req: Request, res: Response) =>
+    //     gameControllerHttp.updateGameHttp(req, res)
+    // );
+    // app.get('/view/games/:id', (req: Request, res: Response) =>
+    //     gameControllerHttp.getGameByIdDetail(req, res)
+    // );
+
+    // app.listen(3000, () => {
+    //     console.log('Server is running on port 3000');
+    // });
 }
 
 main().catch((error) => {

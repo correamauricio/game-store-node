@@ -3,14 +3,64 @@ import { GameResponseDTO } from '../model/dto/response/GameResponseDTO.js';
 import { Game } from '../model/entity/Game.js';
 import { GameCategoryService } from '../model/service/GameCategoryService.js';
 import { GameService } from '../model/service/GameService.js';
+import { IGameController } from '../model/interfaces/IGameController.js';
+import { GameView } from '../view/GameView.js';
 
-export class GameController {
+export class GameControllerTerminal implements IGameController {
     private readonly gameService: GameService;
     private readonly gameCategoryService: GameCategoryService;
+    private readonly gameView: GameView;
 
-    constructor(gameCategoryService: GameCategoryService, gameService: GameService) {
+    constructor(
+        gameCategoryService: GameCategoryService,
+        gameService: GameService,
+        gameView: GameView
+    ) {
         this.gameCategoryService = gameCategoryService;
-        this.gameService = gameService; 
+        this.gameService = gameService;
+        this.gameView = gameView;
+    }
+
+    public async registerGame(): Promise<void> {
+        const request = await this.gameView.readRegisterGameInput();
+        const message = await this.addGame(request);
+        this.gameView.displayMessage(message);
+    }
+
+    public async displayAllGames(): Promise<void> {
+        const games = await this.getAllGames();
+        this.gameView.displayAllGames(games);
+    }
+
+    public async editGame(): Promise<void> {
+        await this.displayAllGames();
+
+        const id = await this.gameView.readEditGameId();
+
+        const game = await this.getGameById(id);
+        if (game == null) {
+            this.gameView.displayGameNotFoundForEdit();
+            return;
+        }
+
+        const request = await this.gameView.readEditGameInput(game);
+        const message = await this.updateGame(id, request);
+        this.gameView.displayMessage(message);
+    }
+
+    public async findGameById(): Promise<void> {
+        try {
+            const id = await this.gameView.readFindGameId();
+            const game = await this.getGameById(id);
+
+            if (game != null) {
+                this.gameView.displayGameDetail(game);
+            } else {
+                this.gameView.displayGameNotFound(id);
+            }
+        } catch {
+            this.gameView.displayInvalidGameId();
+        }
     }
 
     public async addGame(request: GameRequestDTO): Promise<string> {

@@ -4,14 +4,18 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "tsx app/src/main/typescript/com/mauricio/gamestore/Main.ts"
+    "start": "tsx watch app/src/main/typescript/com/mauricio/gamestore/Main.ts"
   },
   "dependencies": {
+    "express": "^5.2.1",
     "mysql2": "^3.14.0"
   },
   "devDependencies": {
+    "@types/express": "^5.0.6",
     "@types/node": "^22.15.0",
     "tsx": "^4.19.0",
     "typescript": "^5.8.0"
   }
 }
+
+

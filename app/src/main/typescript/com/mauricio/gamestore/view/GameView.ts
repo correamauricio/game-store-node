@@ -1,11 +1,7 @@
-import { GameController } from '../controller/GameController.js';
 import { readLine } from '../util/ConsoleInput.js';
 import { GameRequestDTO } from '../model/dto/request/GameRequestDTO.js';
 import { GameResponseDTO } from '../model/dto/response/GameResponseDTO.js';
 import { GameCategoryView } from './GameCategoryView.js';
-import { DatabaseConnection } from '../util/DatabaseConnection.js';
-import { GameService } from '../model/service/GameService.js';
-import { GameCategoryService } from '../model/service/GameCategoryService.js';
 import { GameCategoryController } from '../controller/GameCategoryController.js';
 
 function formatLeft(value: string | number, width: number): string {
@@ -18,35 +14,32 @@ function formatPrice(price: number): string {
 }
 
 export class GameView {
-    private readonly gameController: GameController;
     private readonly gameCategoryController: GameCategoryController;
 
-
-    constructor(gameController: GameController, gameCategoryController: GameCategoryController) {
-        this.gameController = gameController;
+    constructor(gameCategoryController: GameCategoryController) {
         this.gameCategoryController = gameCategoryController;
     }
 
-    public async registerGame(): Promise<void> {
+    public async readRegisterGameInput(): Promise<GameRequestDTO> {
         console.log('\n-- CADASTRO DE NOVO JOGO --');
 
         const title = await readLine('Título: ');
         const gender = await readLine('Gênero: ');
-        const price = parseFloat(await readLine('Preço: '));    
+        const price = parseFloat(await readLine('Preço: '));
 
         const categoryView = new GameCategoryView(this.gameCategoryController);
         await categoryView.displayAllCategories();
 
         const categoryId = parseInt(await readLine('\nEscolha o ID da categoria: '), 10);
 
-        const request = new GameRequestDTO(title, gender, categoryId, price);
-        const message = await this.gameController.addGame(request);
+        return new GameRequestDTO(title, gender, categoryId, price);
+    }
+
+    public displayMessage(message: string): void {
         console.log(message);
     }
 
-    public async displayAllGames(): Promise<void> {
-        const games: GameResponseDTO[] = await this.gameController.getAllGames();
-
+    public displayAllGames(games: GameResponseDTO[]): void {
         console.log('\n-- LISTA DE TODOS OS JOGOS --');
 
         if (games.length === 0) {
@@ -64,18 +57,17 @@ export class GameView {
         }
     }
 
-    public async editGame(): Promise<void> {
+    public async readEditGameId(): Promise<number> {
         console.log('\n-- EDIÇÃO DE JOGO --');
-        await this.displayAllGames();
+        const idLine = await readLine('\nDigite o ID do jogo que deseja editar: ');
+        return parseInt(idLine, 10);
+    }
 
-        const id = parseInt(await readLine('\nDigite o ID do jogo que deseja editar: '), 10);
+    public displayGameNotFoundForEdit(): void {
+        console.log('Erro: Jogo não encontrado.');
+    }
 
-        const game = await this.gameController.getGameById(id);
-        if (game == null) {
-            console.log('Erro: Jogo não encontrado.');
-            return;
-        }
-
+    public async readEditGameInput(game: GameResponseDTO): Promise<GameRequestDTO> {
         console.log('Deixe em branco para manter o valor atual.');
 
         let title = await readLine('Título [' + game.getTitle() + ']: ');
@@ -95,30 +87,29 @@ export class GameView {
         const categoryId =
             categoryIdStr.trim() === '' ? game.getCategoryId() : parseInt(categoryIdStr, 10);
 
-        const request = new GameRequestDTO(title, gender, categoryId, price);
-        const message = await this.gameController.updateGame(id, request);
-        console.log(message);
+        return new GameRequestDTO(title, gender, categoryId, price);
     }
 
-    public async findGameById(): Promise<void> {
+    public async readFindGameId(): Promise<number> {
         console.log('\n-- BUSCAR JOGO POR ID --');
         const idLine = await readLine('Digite o ID do jogo: ');
-        try {
-            const id = parseInt(idLine, 10);
-            const game = await this.gameController.getGameById(id);
+        return parseInt(idLine, 10);
+    }
 
-            if (game != null) {
-                console.log('\nJogo encontrado:');
-                console.log('ID: ' + game.getId());
-                console.log('Título: ' + game.getTitle());
-                console.log('Gênero: ' + game.getGender());
-                console.log('Preço: R$ ' + game.getPrice().toFixed(2));
-                console.log('Categoria: ' + game.getCategoryTitle());
-            } else {
-                console.log('Jogo com ID ' + id + ' não encontrado.');
-            }
-        } catch {
-            console.log('ID inválido. Por favor, digite um número.');
-        }
+    public displayInvalidGameId(): void {
+        console.log('ID inválido. Por favor, digite um número.');
+    }
+
+    public displayGameDetail(game: GameResponseDTO): void {
+        console.log('\nJogo encontrado:');
+        console.log('ID: ' + game.getId());
+        console.log('Título: ' + game.getTitle());
+        console.log('Gênero: ' + game.getGender());
+        console.log('Preço: R$ ' + game.getPrice().toFixed(2));
+        console.log('Categoria: ' + game.getCategoryTitle());
+    }
+
+    public displayGameNotFound(id: number): void {
+        console.log('Jogo com ID ' + id + ' não encontrado.');
     }
 }

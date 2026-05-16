@@ -1,17 +1,17 @@
 
 import { readLine } from '../util/ConsoleInput.js';
 import { CustomerView } from './CustomerView.js';
-import { GameView } from './GameView.js';
+import { GameControllerTerminal } from '../controller/GameControllerTerminal.js';
 import { PurchaseView } from './PurchaseView.js';
 
 export class MainView { 
     private readonly customerView: CustomerView;
-    private readonly gameView: GameView;
+    private readonly gameController: GameControllerTerminal;
     private readonly purchaseView: PurchaseView;
 
-    constructor(customerView: CustomerView, gameView: GameView, purchaseView: PurchaseView) {
+    constructor(customerView: CustomerView, gameController: GameControllerTerminal, purchaseView: PurchaseView) {
         this.customerView = customerView;
-        this.gameView = gameView;
+        this.gameController = gameController;
         this.purchaseView = purchaseView;
     }
 
@@ -39,16 +39,16 @@ export class MainView {
 
             switch (option) {
                 case '1':
-                    await this.gameView.displayAllGames();
+                    await this.gameController.displayAllGames();
                     break;
                 case '2':
-                    await this.gameView.findGameById();
+                    await this.gameController.findGameById();
                     break;
                 case '3':
-                    await this.gameView.registerGame();
+                    await this.gameController.registerGame();
                     break;
                 case '4':
-                    await this.gameView.editGame();
+                    await this.gameController.editGame();
                     break;
                 case '5':
                     await this.customerView.displayAllCustomers();

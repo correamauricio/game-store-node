@@ -3,7 +3,7 @@ import { Customer } from '../entity/Customer.js';
 import { DatabaseConnection } from '../../util/DatabaseConnection.js';
 import { ICustomerService } from '../interfaces/ICustomerService.js';
 import { CustomerUpdateRequestDTO } from '../dto/request/CustomerUpdateRequestDTO.js';
-import { CustomerDAOError } from '../dao/CustomerDAO.js';
+
 import { InternalServerError } from '../entity/InternalServerError.js';
 
 export class CustomerNotFoundError extends Error {
