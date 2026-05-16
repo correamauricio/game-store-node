@@ -8,22 +8,14 @@ import { GameView } from './GameView.js';
 import { PurchaseView } from './PurchaseView.js';
 
 export class MainView { 
-    private readonly gameCategoryController: GameCategoryController;
-    private readonly gameController: GameController;
-    private readonly customerController: CustomerController;
-    private readonly purchaseController: PurchaseController;
     private readonly customerView: CustomerView;
     private readonly gameView: GameView;
     private readonly purchaseView: PurchaseView;
 
-    constructor(gameCategoryController: GameCategoryController, gameController: GameController, customerController: CustomerController, purchaseController: PurchaseController) {
-        this.gameCategoryController = gameCategoryController;
-        this.gameController = gameController;
-        this.customerController = customerController;
-        this.purchaseController = purchaseController;
-        this.customerView = new CustomerView(this.customerController);
-        this.gameView = new GameView(this.gameController, this.gameCategoryController);
-        this.purchaseView = new PurchaseView(this.purchaseController, this.customerController, this.gameController, this.gameCategoryController);
+    constructor(customerView: CustomerView, gameView: GameView, purchaseView: PurchaseView) {
+        this.customerView = customerView;
+        this.gameView = gameView;
+        this.purchaseView = purchaseView;
     }
 
     public async displayMenu(): Promise<void> {
@@ -50,40 +42,40 @@ export class MainView {
 
             switch (option) {
                 case '1':
-                    await new GameView(this.gameController, this.gameCategoryController).displayAllGames();
+                    await this.gameView.displayAllGames();
                     break;
                 case '2':
-                    await new GameView(this.gameController, this.gameCategoryController).findGameById();
+                    await this.gameView.findGameById();
                     break;
                 case '3':
-                    await new GameView(this.gameController, this.gameCategoryController).registerGame();
+                    await this.gameView.registerGame();
                     break;
                 case '4':
-                    await new GameView(this.gameController, this.gameCategoryController).editGame();
+                    await this.gameView.editGame();
                     break;
                 case '5':
-                    await new CustomerView(this.customerController).displayAllCustomers();
+                    await this.customerView.displayAllCustomers();
                     break;
                 case '6':
-                    await new CustomerView(this.customerController).findCustomerById();
+                    await this.customerView.findCustomerById();
                     break;
                 case '7':
-                    await new CustomerView(this.customerController).registerCustomer();
+                    await this.customerView.registerCustomer();
                     break;
                 case '8':
-                    await new CustomerView(this.customerController).editCustomer();
+                    await this.customerView.editCustomer();
                     break;
                 case '9':
-                    await new PurchaseView(this.purchaseController, this.customerController, this.gameController, this.gameCategoryController).displayAllPurchases();
+                    await this.purchaseView.displayAllPurchases();
                     break;
                 case '10':
-                    await new PurchaseView(this.purchaseController, this.customerController, this.gameController, this.gameCategoryController).searchPurchaseById();
+                    await this.purchaseView.searchPurchaseById();
                     break;
                 case '11':
-                    await new PurchaseView(this.purchaseController, this.customerController, this.gameController, this.gameCategoryController).registerPurchase();
+                    await this.purchaseView.registerPurchase();
                     break;
                 case '12':
-                    await new PurchaseView(this.purchaseController, this.customerController, this.gameController, this.gameCategoryController).editPurchase();
+                    await this.purchaseView.editPurchase();
                     break;
 
                 case '0':

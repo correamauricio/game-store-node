@@ -7,7 +7,10 @@ import { GameCategoryService } from './model/service/GameCategoryService.js';
 import { GameService } from './model/service/GameService.js';
 import { PurchaseService } from './model/service/PurchaseService.js';
 import { DatabaseConnection } from './util/DatabaseConnection.js';
+import { CustomerView } from './view/CustomerView.js';
+import { GameView } from './view/GameView.js';
 import { MainView } from './view/MainView.js';
+import { PurchaseView } from './view/PurchaseView.js';
 
 async function main(): Promise<void> {
 
@@ -24,7 +27,11 @@ async function main(): Promise<void> {
     const customerController = new CustomerController(customerService);
     const purchaseController = new PurchaseController(purchaseService, customerService, gameService);
 
-    const mainView = new MainView(gameCategoryController, gameController, customerController, purchaseController);   
+    const customerView = new CustomerView(customerController);
+    const gameView = new GameView(gameController, gameCategoryController);
+    const purchaseView = new PurchaseView(purchaseController, customerController, gameController, gameCategoryController);
+    
+    const mainView = new MainView(customerView, gameView, purchaseView);   
 
     await mainView.displayMenu();
 }
