@@ -1,5 +1,7 @@
 import { Connection, RowDataPacket } from 'mysql2/promise';
 import { Customer } from '../entity/Customer.js';
+import { InternalServerError } from '../entity/InternalServerError.js';
+
 
 export class CustomerDAO {
     private readonly conn: Connection;
@@ -44,7 +46,8 @@ export class CustomerDAO {
                 );
             }
         } catch (e) {
-            console.error('Erro ao buscar cliente por ID: ' + (e as Error).message);
+            console.error((e as Error).message);
+            throw new InternalServerError('[CustomerDAO] - Erro ao buscar cliente por ID: ' + id);
         }
         return null;
     }

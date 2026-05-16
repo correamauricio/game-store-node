@@ -2,7 +2,7 @@ import { CustomerController } from './controller/CustomerController.js';
 import { GameCategoryController } from './controller/GameCategoryController.js';
 import { GameController } from './controller/GameController.js';
 import { PurchaseController } from './controller/PurchaseController.js';
-import { CustomerService } from './model/service/CustomerService.js';
+import { CustomerNotFoundError, CustomerService } from './model/service/CustomerService.js';
 import { GameCategoryService } from './model/service/GameCategoryService.js';
 import { GameService } from './model/service/GameService.js';
 import { PurchaseService } from './model/service/PurchaseService.js';
@@ -12,6 +12,7 @@ import { GameView } from './view/GameView.js';
 import { MainView } from './view/MainView.js';
 import { PurchaseView } from './view/PurchaseView.js';
 import { ICustomerService } from './model/interfaces/ICustomerService.js';
+import { HttpRequestError } from './controller/CustomerController.js';
 
 async function main(): Promise<void> {
 
@@ -34,7 +35,25 @@ async function main(): Promise<void> {
 
     const mainView = new MainView(customerView, gameView, purchaseView);   
 
-    await mainView.displayMenu();
+    while (true) {
+        try {
+                await mainView.displayMenu();
+            } catch(error: any) {
+
+                
+                if(error instanceof HttpRequestError) {
+                    // Saída de erro colorida no console
+                    console.error(
+                        `\x1b[31m[ERRO - ${error.code || 'N/A'}] ${error.message}\x1b[0m\n` +
+                        `\x1b[33mStatus:\x1b[0m ${error.status || 'N/A'}\n` +
+                        `\x1b[90mTimestamp:\x1b[0m ${new Date().toLocaleString()}`
+                    );
+            
+                } else {
+                    console.log(error);
+                }
+            }
+    }
 }
 
 main().catch((error) => {

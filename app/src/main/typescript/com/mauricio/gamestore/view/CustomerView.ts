@@ -3,7 +3,7 @@ import { readLine } from '../util/ConsoleInput.js';
 import { CustomerRequestDTO } from '../model/dto/request/CustomerRequestDTO.js';
 import { CustomerResponseDTO } from '../model/dto/response/CustomerResponseDTO.js';
 import { DatabaseConnection } from '../util/DatabaseConnection.js';
-import { CustomerService } from '../model/service/CustomerService.js';
+import { CustomerNotFoundError, CustomerService } from '../model/service/CustomerService.js';
 import { CustomerUpdateRequestDTO } from '../model/dto/request/CustomerUpdateRequestDTO.js';
 
 function formatLeft(value: string | number, width: number): string {
@@ -58,22 +58,18 @@ export class CustomerView {
     public async findCustomerById(): Promise<void> {
         console.log('\n -- BUSCAR CLIENTE POR ID --');
         const idLine = await readLine('Digite o ID do cliente: ');
-        try {
+       
             const id = parseInt(idLine, 10);
             const customer = await this.customerController.findById(id);
 
-            if (customer != null) {
+            
                 console.log('\nCliente encontrado:');
                 console.log('ID: ' + customer.getId());
                 console.log('Nome: ' + customer.getName());
                 console.log('Email: ' + customer.getEmail());
                 console.log('Idade: ' + customer.getAge());
-            } else {
-                console.log('Cliente com ID ' + id + ' não encontrado.');
-            }
-        } catch {
-            console.log('ID inválido. Por favor, digite um número.');
-        }
+          
+
     }
 
     public async editCustomer(): Promise<void> {
@@ -107,6 +103,12 @@ export class CustomerView {
                 }
             
         } catch(error: unknown) {
+            if(error instanceof CustomerNotFoundError) {
+                console.log(JSON.stringify(error, null, 2));
+            } else {
+                console.log('Erro ao atualizar cliente:');
+                console.log(error);
+            }
             console.log('Erro ao atualizar cliente:');
             console.log(error);
             //console.log('Entrada inválida. Operação cancelada.');

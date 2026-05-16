@@ -16,7 +16,7 @@ export class MainView {
     }
 
     public async displayMenu(): Promise<void> {
-        while (true) {
+       
             console.log('\n -- MENU DO SISTEMA --');
             console.log('1. Listar todos os Jogos');
             console.log('2. Buscar Jogo por ID');
@@ -81,6 +81,6 @@ export class MainView {
                 default:
                     console.log('Opção inválida. Tente novamente.');
             }
-        }
+        
     }
 }

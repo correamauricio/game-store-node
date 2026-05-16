@@ -3,6 +3,15 @@ import { Customer } from '../entity/Customer.js';
 import { DatabaseConnection } from '../../util/DatabaseConnection.js';
 import { ICustomerService } from '../interfaces/ICustomerService.js';
 import { CustomerUpdateRequestDTO } from '../dto/request/CustomerUpdateRequestDTO.js';
+import { CustomerDAOError } from '../dao/CustomerDAO.js';
+import { InternalServerError } from '../entity/InternalServerError.js';
+
+export class CustomerNotFoundError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'CUSTOMER_NOT_FOUND_ERROR';
+    }
+}
 
 export class CustomerService implements ICustomerService {
     private readonly databaseConnection: DatabaseConnection;
@@ -24,17 +33,23 @@ export class CustomerService implements ICustomerService {
         return [];
     }
 
-    public async findById(id: number): Promise<Customer | null> {
+    public async findById(id: number): Promise<Customer> {
         const conn = await this.databaseConnection.getConnection();
         try {
             const dao = new CustomerDAO(conn);
-            return await dao.findById(id);
+            let customer = await dao.findById(id);
+            if (customer == null) {
+                throw new CustomerNotFoundError('Cliente com ID ' + id + ' não encontrado.');
+            }
+            return customer;
         } catch (e) {
-            console.error('Erro ao buscar cliente: ' + (e as Error).message);
+            if(e instanceof InternalServerError) {
+                throw new Error(e.message, { cause: e });
+            }
+            throw e;
         } finally {
             await conn.end();
-        }
-        return null;
+        }   
     }
 
     public async registerCustomer(customer: Customer): Promise<boolean> {
