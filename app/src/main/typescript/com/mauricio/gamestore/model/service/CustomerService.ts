@@ -1,8 +1,10 @@
 import { CustomerDAO } from '../dao/CustomerDAO.js';
 import { Customer } from '../entity/Customer.js';
 import { DatabaseConnection } from '../../util/DatabaseConnection.js';
+import { ICustomerService } from '../interfaces/ICustomerService.js';
+import { CustomerUpdateRequestDTO } from '../dto/request/CustomerUpdateRequestDTO.js';
 
-export class CustomerService {
+export class CustomerService implements ICustomerService {
     private readonly databaseConnection: DatabaseConnection;
 
     constructor(databaseConnection: DatabaseConnection) {
@@ -48,11 +50,28 @@ export class CustomerService {
         }
     }
 
-    public async updateCustomer(customer: Customer): Promise<boolean> {
+    public async updateCustomer(id: number, request: CustomerUpdateRequestDTO): Promise<boolean> {
         const conn = await this.databaseConnection.getConnection();
         try {
+
             const dao = new CustomerDAO(conn);
-            return await dao.update(customer);
+            const customerDb = await dao.findById(id);
+
+            if (customerDb == null) {
+                throw new Error('Cliente com ID ' + id + ' não encontrado.');
+            }
+
+            if(request.email != null) {
+                customerDb.setEmail(request.email);
+            }
+            if(request.age != null) {
+                customerDb.setAge(request.age);
+            }
+            if(request.name != null) {
+                customerDb.setName(request.name);
+            }
+
+            return await dao.update(customerDb);
         } catch (e) {
             console.error('Erro ao atualizar cliente: ' + (e as Error).message);
             return false;

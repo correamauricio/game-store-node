@@ -4,6 +4,7 @@ import { CustomerRequestDTO } from '../model/dto/request/CustomerRequestDTO.js';
 import { CustomerResponseDTO } from '../model/dto/response/CustomerResponseDTO.js';
 import { DatabaseConnection } from '../util/DatabaseConnection.js';
 import { CustomerService } from '../model/service/CustomerService.js';
+import { CustomerUpdateRequestDTO } from '../model/dto/request/CustomerUpdateRequestDTO.js';
 
 function formatLeft(value: string | number, width: number): string {
     const str = String(value);
@@ -22,17 +23,17 @@ export class CustomerView {
         console.log('\n -- CADASTRAR NOVO CLIENTE --');
         const name = await readLine('Nome: ');
         const email = await readLine('Email: ');
-        const ageLine = await readLine('Idade: ');
+        const age = await readLine('Idade: ');
         try {
-            const age = parseInt(ageLine, 10);
+            
             const request = new CustomerRequestDTO(name, email, age);
             if (await this.customerController.registerCustomer(request)) {
                 console.log('Cliente cadastrado com sucesso!');
             } else {
                 console.log('Erro ao cadastrar cliente.');
             }
-        } catch {
-            console.log('Idade inválida. Operação cancelada.');
+        } catch(error: unknown) {
+            console.log((error as Error).message);
         }
     }
 
@@ -83,7 +84,7 @@ export class CustomerView {
             const id = parseInt(idLine, 10);
             const customer = await this.customerController.findById(id);
 
-            if (customer != null) {
+            
                 console.log(
                     'Dados atuais - Nome: ' +
                         customer.getName() +
@@ -94,25 +95,21 @@ export class CustomerView {
                 );
 
                 let name = await readLine('Novo nome (deixe em branco para manter): ');
-                if (name.trim() === '') name = customer.getName();
-
                 let email = await readLine('Novo email (deixe em branco para manter): ');
-                if (email.trim() === '') email = customer.getEmail();
+                const age = await readLine('Nova idade (deixe em branco para manter): ');
+              
 
-                const ageStr = await readLine('Nova idade (deixe em branco para manter): ');
-                const age = ageStr.trim() === '' ? customer.getAge() : parseInt(ageStr, 10);
-
-                const request = new CustomerRequestDTO(name, email, age);
+                const request = new CustomerUpdateRequestDTO(name, email, age);
                 if (await this.customerController.updateCustomer(id, request)) {
                     console.log('Cliente atualizado com sucesso!');
                 } else {
                     console.log('Erro ao atualizar cliente.');
                 }
-            } else {
-                console.log('Cliente com ID ' + id + ' não encontrado.');
-            }
-        } catch {
-            console.log('Entrada inválida. Operação cancelada.');
+            
+        } catch(error: unknown) {
+            console.log('Erro ao atualizar cliente:');
+            console.log(error);
+            //console.log('Entrada inválida. Operação cancelada.');
         }
     }
 }

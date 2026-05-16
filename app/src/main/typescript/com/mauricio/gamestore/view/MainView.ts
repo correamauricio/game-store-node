@@ -1,7 +1,4 @@
-import { CustomerController } from '../controller/CustomerController.js';
-import { GameCategoryController } from '../controller/GameCategoryController.js';
-import { GameController } from '../controller/GameController.js';
-import { PurchaseController } from '../controller/PurchaseController.js';
+
 import { readLine } from '../util/ConsoleInput.js';
 import { CustomerView } from './CustomerView.js';
 import { GameView } from './GameView.js';

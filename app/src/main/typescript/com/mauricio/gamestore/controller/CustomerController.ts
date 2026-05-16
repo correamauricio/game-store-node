@@ -1,33 +1,38 @@
 import { CustomerRequestDTO } from '../model/dto/request/CustomerRequestDTO.js';
+import { CustomerUpdateRequestDTO } from '../model/dto/request/CustomerUpdateRequestDTO.js';
 import { CustomerResponseDTO } from '../model/dto/response/CustomerResponseDTO.js';
 import { Customer } from '../model/entity/Customer.js';
-import { CustomerService } from '../model/service/CustomerService.js';
+import { ICustomerService } from '../model/interfaces/ICustomerService.js';
 
 export class CustomerController {
-    private readonly customerService: CustomerService;
+    private readonly customerService: ICustomerService;
 
-    constructor(customerService: CustomerService) {
+    constructor(customerService: ICustomerService) {
         this.customerService = customerService;
     }
 
     public async getAllCustomers(): Promise<CustomerResponseDTO[]> {
         const customers = await this.customerService.getAllCustomers();
-        return customers.map((customer) => this.convertToResponseDTO(customer));
+        return customers.map((customer: Customer) => this.convertToResponseDTO(customer));
     }
 
-    public async findById(id: number): Promise<CustomerResponseDTO | null> {
+    public async findById(id: number): Promise<CustomerResponseDTO> {
         const customer = await this.customerService.findById(id);
-        return customer != null ? this.convertToResponseDTO(customer) : null;
+        if (customer == null) {
+            throw new Error('Cliente com ID ' + id + ' não encontrado.');
+        }
+        return this.convertToResponseDTO(customer);
+        
     }
 
     public async registerCustomer(request: CustomerRequestDTO): Promise<boolean> {
-        const customer = new Customer(request.getName(), request.getEmail(), request.getAge());
+        const customer = new Customer(request.name, request.email, request.age);
         return await this.customerService.registerCustomer(customer);
     }
 
-    public async updateCustomer(id: number, request: CustomerRequestDTO): Promise<boolean> {
-        const customer = new Customer(id, request.getName(), request.getEmail(), request.getAge());
-        return await this.customerService.updateCustomer(customer);
+    public async updateCustomer(id: number, request: CustomerUpdateRequestDTO): Promise<boolean> {
+        
+        return await this.customerService.updateCustomer(id, request);
     }
 
     private convertToResponseDTO(customer: Customer): CustomerResponseDTO {

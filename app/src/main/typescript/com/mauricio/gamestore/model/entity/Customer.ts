@@ -1,8 +1,8 @@
 export class Customer {
     private id!: number;
-    private name: string;
-    private email: string;
-    private age: number;
+    private name!: string;
+    private email!: string;
+    private age!: number;
 
     constructor(name: string, email: string, age: number);
     constructor(id: number, name: string, email: string, age: number);

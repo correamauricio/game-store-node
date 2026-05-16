@@ -1,9 +1,7 @@
 import { PurchaseRequestDTO } from '../model/dto/request/PurchaseRequestDTO.js';
 import { PurchaseResponseDTO } from '../model/dto/response/PurchaseResponseDTO.js';
-import { Customer } from '../model/entity/Customer.js';
-import { Game } from '../model/entity/Game.js';
 import { Purchase } from '../model/entity/Purchase.js';
-import { CustomerService } from '../model/service/CustomerService.js';
+import { ICustomerService } from '../model/interfaces/ICustomerService.js';
 import { GameService } from '../model/service/GameService.js';
 import { PurchaseService } from '../model/service/PurchaseService.js';
     
@@ -17,10 +15,10 @@ function localDateNow(): string {
 
 export class PurchaseController {
     private readonly purchaseService: PurchaseService;
-    private readonly customerService: CustomerService;
+    private readonly customerService: ICustomerService;
     private readonly gameService: GameService;
 
-    constructor(purchaseService: PurchaseService, customerService: CustomerService, gameService: GameService) {
+    constructor(purchaseService: PurchaseService, customerService: ICustomerService, gameService: GameService) {
         this.purchaseService = purchaseService;
         this.customerService = customerService;
         this.gameService = gameService;
@@ -28,7 +26,7 @@ export class PurchaseController {
 
     public async getAllPurchases(): Promise<PurchaseResponseDTO[]> {
         const purchases = await this.purchaseService.listAllPurchases();
-        return purchases.map((purchase) => this.convertToResponseDTO(purchase));
+        return purchases.map((purchase: Purchase) => this.convertToResponseDTO(purchase));
     }
 
     public async getPurchaseById(id: number): Promise<PurchaseResponseDTO | null> {
