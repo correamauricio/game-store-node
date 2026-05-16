@@ -9,6 +9,9 @@ import { GameService } from '../model/service/GameService.js';
 import { GameCategoryService } from '../model/service/GameCategoryService.js';
 import { PurchaseService } from '../model/service/PurchaseService.js';
 import { CustomerService } from '../model/service/CustomerService.js';
+import { CustomerController } from '../controller/CustomerController.js';
+import { GameCategoryController } from '../controller/GameCategoryController.js';
+import { GameController } from '../controller/GameController.js';
 
 function formatLeft(value: string | number, width: number): string {
     const str = String(value);
@@ -21,21 +24,21 @@ function formatTotal(value: number): string {
 
 export class PurchaseView {
     private readonly purchaseController: PurchaseController;
+    private readonly customerController: CustomerController;
+    private readonly gameController: GameController;
+    private readonly gameCategoryController: GameCategoryController;
     private readonly customerView: CustomerView;
     private readonly gameView: GameView;
-    private readonly customerService: CustomerService;
-    private readonly gameService: GameService;
-    private readonly gameCategoryService: GameCategoryService;
-    private readonly purchaseService: PurchaseService;  
+  
 
-    constructor(purchaseService: PurchaseService, customerService: CustomerService, gameService: GameService, gameCategoryService: GameCategoryService) {
-        this.purchaseService = purchaseService;
-        this.customerService = customerService;
-        this.gameService = gameService;
-        this.gameCategoryService = gameCategoryService;
-        this.purchaseController = new PurchaseController(this.purchaseService, this.customerService, this.gameService);
-        this.customerView = new CustomerView(this.customerService);
-        this.gameView = new GameView(this.gameCategoryService, this.gameService);
+    constructor(purchaseController: PurchaseController, customerController: CustomerController, gameController: GameController, gameCategoryController: GameCategoryController) {
+        
+        this.purchaseController = purchaseController;
+        this.customerController = customerController;   
+        this.gameController = gameController;
+        this.gameCategoryController = gameCategoryController;
+        this.customerView = new CustomerView(this.customerController);
+        this.gameView = new GameView(this.gameController, this.gameCategoryController);
     }
 
     public async displayAllPurchases(): Promise<void> {

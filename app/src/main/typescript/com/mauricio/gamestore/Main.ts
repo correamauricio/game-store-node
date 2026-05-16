@@ -1,3 +1,7 @@
+import { CustomerController } from './controller/CustomerController.js';
+import { GameCategoryController } from './controller/GameCategoryController.js';
+import { GameController } from './controller/GameController.js';
+import { PurchaseController } from './controller/PurchaseController.js';
 import { CustomerService } from './model/service/CustomerService.js';
 import { GameCategoryService } from './model/service/GameCategoryService.js';
 import { GameService } from './model/service/GameService.js';
@@ -15,7 +19,13 @@ async function main(): Promise<void> {
     const customerService = new CustomerService(databaseConnection);
     const purchaseService = new PurchaseService(databaseConnection);
 
-    const mainView = new MainView(gameCategoryService, gameService, customerService, purchaseService);   
+    const gameCategoryController = new GameCategoryController(gameCategoryService);
+    const gameController = new GameController(gameCategoryService, gameService);
+    const customerController = new CustomerController(customerService);
+    const purchaseController = new PurchaseController(purchaseService, customerService, gameService);
+
+    const mainView = new MainView(gameCategoryController, gameController, customerController, purchaseController);   
+
     await mainView.displayMenu();
 }
 

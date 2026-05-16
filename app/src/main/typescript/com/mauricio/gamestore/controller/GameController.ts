@@ -10,7 +10,7 @@ export class GameController {
 
     constructor(gameCategoryService: GameCategoryService, gameService: GameService) {
         this.gameCategoryService = gameCategoryService;
-        this.gameService = gameService;
+        this.gameService = gameService; 
     }
 
     public async addGame(request: GameRequestDTO): Promise<string> {

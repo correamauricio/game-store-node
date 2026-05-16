@@ -13,8 +13,9 @@ function formatLeft(value: string | number, width: number): string {
 export class CustomerView {
     private readonly customerController: CustomerController;
 
-    constructor(customerService: CustomerService) {
-        this.customerController = new CustomerController(customerService);
+
+    constructor(customerController: CustomerController) {
+        this.customerController = customerController;
     }
 
     public async registerCustomer(): Promise<void> {

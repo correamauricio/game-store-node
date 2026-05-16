@@ -6,6 +6,7 @@ import { GameCategoryView } from './GameCategoryView.js';
 import { DatabaseConnection } from '../util/DatabaseConnection.js';
 import { GameService } from '../model/service/GameService.js';
 import { GameCategoryService } from '../model/service/GameCategoryService.js';
+import { GameCategoryController } from '../controller/GameCategoryController.js';
 
 function formatLeft(value: string | number, width: number): string {
     const str = String(value);
@@ -18,13 +19,12 @@ function formatPrice(price: number): string {
 
 export class GameView {
     private readonly gameController: GameController;
-    private readonly gameCategoryService: GameCategoryService;
-    private readonly gameService: GameService;
+    private readonly gameCategoryController: GameCategoryController;
 
-    constructor(gameCategoryService: GameCategoryService, gameService: GameService) {
-        this.gameController = new GameController(gameCategoryService, gameService);
-        this.gameCategoryService = gameCategoryService;
-        this.gameService = gameService;
+
+    constructor(gameController: GameController, gameCategoryController: GameCategoryController) {
+        this.gameController = gameController;
+        this.gameCategoryController = gameCategoryController;
     }
 
     public async registerGame(): Promise<void> {
@@ -34,7 +34,7 @@ export class GameView {
         const gender = await readLine('Gênero: ');
         const price = parseFloat(await readLine('Preço: '));    
 
-        const categoryView = new GameCategoryView(this.gameCategoryService);
+        const categoryView = new GameCategoryView(this.gameCategoryController);
         await categoryView.displayAllCategories();
 
         const categoryId = parseInt(await readLine('\nEscolha o ID da categoria: '), 10);
@@ -87,7 +87,7 @@ export class GameView {
         const priceStr = await readLine('Preço [' + game.getPrice() + ']: ');
         const price = priceStr.trim() === '' ? game.getPrice() : parseFloat(priceStr);
 
-        const categoryView = new GameCategoryView(this.gameCategoryService);
+        const categoryView = new GameCategoryView(this.gameCategoryController);
         await categoryView.displayAllCategories();
         const categoryIdStr = await readLine(
             'Escolha o ID da categoria [' + game.getCategoryId() + ']: '
