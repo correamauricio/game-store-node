@@ -6,8 +6,7 @@ import { Purchase } from '../model/entity/Purchase.js';
 import { CustomerService } from '../model/service/CustomerService.js';
 import { GameService } from '../model/service/GameService.js';
 import { PurchaseService } from '../model/service/PurchaseService.js';
-import { DatabaseConnection } from '../util/DatabaseConnection.js';
-
+    
 function localDateNow(): string {
     const now = new Date();
     const year = now.getFullYear();
@@ -21,10 +20,10 @@ export class PurchaseController {
     private readonly customerService: CustomerService;
     private readonly gameService: GameService;
 
-    constructor(databaseConnection: DatabaseConnection) {
-        this.purchaseService = new PurchaseService(databaseConnection);
-        this.customerService = new CustomerService(databaseConnection);
-        this.gameService = new GameService(databaseConnection);
+    constructor(purchaseService: PurchaseService, customerService: CustomerService, gameService: GameService) {
+        this.purchaseService = purchaseService;
+        this.customerService = customerService;
+        this.gameService = gameService;
     }
 
     public async getAllPurchases(): Promise<PurchaseResponseDTO[]> {

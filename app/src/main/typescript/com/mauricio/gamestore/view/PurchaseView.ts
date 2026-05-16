@@ -5,6 +5,10 @@ import { PurchaseResponseDTO } from '../model/dto/response/PurchaseResponseDTO.j
 import { CustomerView } from './CustomerView.js';
 import { GameView } from './GameView.js';
 import { DatabaseConnection } from '../util/DatabaseConnection.js';
+import { GameService } from '../model/service/GameService.js';
+import { GameCategoryService } from '../model/service/GameCategoryService.js';
+import { PurchaseService } from '../model/service/PurchaseService.js';
+import { CustomerService } from '../model/service/CustomerService.js';
 
 function formatLeft(value: string | number, width: number): string {
     const str = String(value);
@@ -19,11 +23,19 @@ export class PurchaseView {
     private readonly purchaseController: PurchaseController;
     private readonly customerView: CustomerView;
     private readonly gameView: GameView;
+    private readonly customerService: CustomerService;
+    private readonly gameService: GameService;
+    private readonly gameCategoryService: GameCategoryService;
+    private readonly purchaseService: PurchaseService;  
 
-    constructor(databaseConnection: DatabaseConnection) {
-        this.purchaseController = new PurchaseController(databaseConnection);
-        this.customerView = new CustomerView(databaseConnection);
-        this.gameView = new GameView(databaseConnection);
+    constructor(purchaseService: PurchaseService, customerService: CustomerService, gameService: GameService, gameCategoryService: GameCategoryService) {
+        this.purchaseService = purchaseService;
+        this.customerService = customerService;
+        this.gameService = gameService;
+        this.gameCategoryService = gameCategoryService;
+        this.purchaseController = new PurchaseController(this.purchaseService, this.customerService, this.gameService);
+        this.customerView = new CustomerView(this.customerService);
+        this.gameView = new GameView(this.gameCategoryService, this.gameService);
     }
 
     public async displayAllPurchases(): Promise<void> {

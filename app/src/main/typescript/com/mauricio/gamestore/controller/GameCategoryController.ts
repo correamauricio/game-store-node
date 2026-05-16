@@ -1,13 +1,12 @@
 import { GameCategoryResponseDTO } from '../model/dto/response/GameCategoryResponseDTO.js';
 import { GameCategory } from '../model/entity/GameCategory.js';
 import { GameCategoryService } from '../model/service/GameCategoryService.js';
-import { DatabaseConnection } from '../util/DatabaseConnection.js';
 
 export class GameCategoryController {
     private readonly categoryService: GameCategoryService;
 
-    constructor(databaseConnection: DatabaseConnection) {
-        this.categoryService = new GameCategoryService(databaseConnection);
+    constructor(gameCategoryService: GameCategoryService) {
+        this.categoryService = gameCategoryService;
     }
 
     public async findAll(): Promise<GameCategoryResponseDTO[]> {

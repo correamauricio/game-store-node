@@ -2,13 +2,12 @@ import { CustomerRequestDTO } from '../model/dto/request/CustomerRequestDTO.js';
 import { CustomerResponseDTO } from '../model/dto/response/CustomerResponseDTO.js';
 import { Customer } from '../model/entity/Customer.js';
 import { CustomerService } from '../model/service/CustomerService.js';
-import { DatabaseConnection } from '../util/DatabaseConnection.js';
 
 export class CustomerController {
     private readonly customerService: CustomerService;
 
-    constructor(databaseConnection: DatabaseConnection) {
-        this.customerService = new CustomerService(databaseConnection);
+    constructor(customerService: CustomerService) {
+        this.customerService = customerService;
     }
 
     public async getAllCustomers(): Promise<CustomerResponseDTO[]> {

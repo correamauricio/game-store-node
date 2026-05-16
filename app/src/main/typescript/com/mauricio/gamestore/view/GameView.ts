@@ -4,6 +4,8 @@ import { GameRequestDTO } from '../model/dto/request/GameRequestDTO.js';
 import { GameResponseDTO } from '../model/dto/response/GameResponseDTO.js';
 import { GameCategoryView } from './GameCategoryView.js';
 import { DatabaseConnection } from '../util/DatabaseConnection.js';
+import { GameService } from '../model/service/GameService.js';
+import { GameCategoryService } from '../model/service/GameCategoryService.js';
 
 function formatLeft(value: string | number, width: number): string {
     const str = String(value);
@@ -16,11 +18,13 @@ function formatPrice(price: number): string {
 
 export class GameView {
     private readonly gameController: GameController;
-    private readonly databaseConnection: DatabaseConnection;
+    private readonly gameCategoryService: GameCategoryService;
+    private readonly gameService: GameService;
 
-    constructor(databaseConnection: DatabaseConnection) {
-        this.gameController = new GameController(databaseConnection);
-        this.databaseConnection = databaseConnection;
+    constructor(gameCategoryService: GameCategoryService, gameService: GameService) {
+        this.gameController = new GameController(gameCategoryService, gameService);
+        this.gameCategoryService = gameCategoryService;
+        this.gameService = gameService;
     }
 
     public async registerGame(): Promise<void> {
@@ -28,9 +32,9 @@ export class GameView {
 
         const title = await readLine('Título: ');
         const gender = await readLine('Gênero: ');
-        const price = parseFloat(await readLine('Preço: '));
+        const price = parseFloat(await readLine('Preço: '));    
 
-        const categoryView = new GameCategoryView(this.databaseConnection);
+        const categoryView = new GameCategoryView(this.gameCategoryService);
         await categoryView.displayAllCategories();
 
         const categoryId = parseInt(await readLine('\nEscolha o ID da categoria: '), 10);
@@ -83,7 +87,7 @@ export class GameView {
         const priceStr = await readLine('Preço [' + game.getPrice() + ']: ');
         const price = priceStr.trim() === '' ? game.getPrice() : parseFloat(priceStr);
 
-        const categoryView = new GameCategoryView(this.databaseConnection);
+        const categoryView = new GameCategoryView(this.gameCategoryService);
         await categoryView.displayAllCategories();
         const categoryIdStr = await readLine(
             'Escolha o ID da categoria [' + game.getCategoryId() + ']: '

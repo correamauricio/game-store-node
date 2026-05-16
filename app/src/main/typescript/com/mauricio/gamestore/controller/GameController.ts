@@ -3,15 +3,14 @@ import { GameResponseDTO } from '../model/dto/response/GameResponseDTO.js';
 import { Game } from '../model/entity/Game.js';
 import { GameCategoryService } from '../model/service/GameCategoryService.js';
 import { GameService } from '../model/service/GameService.js';
-import { DatabaseConnection } from '../util/DatabaseConnection.js';
 
 export class GameController {
     private readonly gameService: GameService;
     private readonly gameCategoryService: GameCategoryService;
 
-    constructor(databaseConnection: DatabaseConnection) {
-        this.gameService = new GameService(databaseConnection);
-        this.gameCategoryService = new GameCategoryService(databaseConnection);
+    constructor(gameCategoryService: GameCategoryService, gameService: GameService) {
+        this.gameCategoryService = gameCategoryService;
+        this.gameService = gameService;
     }
 
     public async addGame(request: GameRequestDTO): Promise<string> {

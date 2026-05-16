@@ -3,6 +3,7 @@ import { readLine } from '../util/ConsoleInput.js';
 import { CustomerRequestDTO } from '../model/dto/request/CustomerRequestDTO.js';
 import { CustomerResponseDTO } from '../model/dto/response/CustomerResponseDTO.js';
 import { DatabaseConnection } from '../util/DatabaseConnection.js';
+import { CustomerService } from '../model/service/CustomerService.js';
 
 function formatLeft(value: string | number, width: number): string {
     const str = String(value);
@@ -12,8 +13,8 @@ function formatLeft(value: string | number, width: number): string {
 export class CustomerView {
     private readonly customerController: CustomerController;
 
-    constructor(databaseConnection: DatabaseConnection) {
-        this.customerController = new CustomerController(databaseConnection);
+    constructor(customerService: CustomerService) {
+        this.customerController = new CustomerController(customerService);
     }
 
     public async registerCustomer(): Promise<void> {

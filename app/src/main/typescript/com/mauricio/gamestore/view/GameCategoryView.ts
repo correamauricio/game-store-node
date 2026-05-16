@@ -1,12 +1,12 @@
 import { GameCategoryController } from '../controller/GameCategoryController.js';
 import { GameCategoryResponseDTO } from '../model/dto/response/GameCategoryResponseDTO.js';
-import { DatabaseConnection } from '../util/DatabaseConnection.js';
+import { GameCategoryService } from '../model/service/GameCategoryService.js';
 
 export class GameCategoryView {
     private readonly gameCategoryController: GameCategoryController;
 
-    constructor(databaseConnection: DatabaseConnection) {
-        this.gameCategoryController = new GameCategoryController(databaseConnection);
+    constructor(gameCategoryService: GameCategoryService) {
+        this.gameCategoryController = new GameCategoryController(gameCategoryService);
     }
 
     public async displayAllCategories(): Promise<void> {
